@@ -1,0 +1,143 @@
+/* Full-screen background image */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: url('/assets/images/car-wash.jpeg') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Center the wrapper using flexbox */
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.container {
+    /* max-width: 400px; */
+    margin: 0 auto;
+    padding: 16px; /* Reduced from 30px */
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 0;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e0e0e0;
+    animation: fadeIn 0.5s ease-in-out;
+    width: 40%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h2 {
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 18px; /* Reduced from 25px */
+    font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+    font-style: italic;
+    font-size: 2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #495057;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-control {
+    margin-top: 6px; /* Reduced from 10px */
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    padding: 8px; /* Reduced from 14px */
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+    height: auto; /* Remove fixed height */
+    width: 80%;
+    margin-left: 40px;
+}
+
+.form-group input{
+    width: 80%;
+    margin-left: 40px;
+}
+
+form label{
+    margin-left: 40px;
+}
+
+.form-control:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 86, 179, 0.4);
+}
+
+.text-danger {
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #dc3545;
+}
+
+.btn-success {
+    width: 85%;
+    margin-left: 35px;
+    padding: 10px; 
+    font-size: 1.1rem;
+    border-radius: 10px;
+    margin-top: 18px; 
+    cursor: pointer;
+    background-color: #0056b3; /* Darker blue background */
+    border: none;
+    color: #ffffff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-success:hover {
+    background-color: #003d80; /* Even darker blue on hover */
+    transform: scale(1.03); /* Slight zoom effect */
+}
+
+p {
+    text-align: center;
+    font-size: 0.95rem;
+    margin-top: 14px; /* Reduced from 20px */
+    color: #555555;
+}
+
+p a {
+    color: #0056b3;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+p a:hover {
+    text-decoration: underline;
+    color: #003d80;
+}
+
+.form-group {
+    margin-bottom: 14px; /* Reduced from 25px */
+}

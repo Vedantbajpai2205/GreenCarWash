@@ -1,0 +1,53 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">🧽</div>
+      <div class="name">{{ washerName || 'Washer' }}</div>
+    </div>
+    <nav class="nav-menu">
+      <a (click)="setSection('washRequests')" [class.active]="section==='washRequests'">Wash Requests</a>
+      <a (click)="setSection('profile')" [class.active]="section==='profile'">Profile</a>
+      <a (click)="logout()">Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div *ngIf="section === 'washRequests'">
+      <h2>Assigned Wash Requests</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Car</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Change Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of washRequests">
+            <td>{{ request.orderId }}</td>
+            <td>{{ request.customerName }}</td>
+            <td>{{ request.car }}</td>
+            <td>{{ request.date }}</td>
+            <td>{{ request.location }}</td>
+            <td>
+              <input [(ngModel)]="request.status" placeholder="Enter status" />
+            </td>
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="updateStatus(request)">Save</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="section === 'profile'">
+      <h2>Profile</h2>
+      <div>
+        <p><strong>Name:</strong> {{ washerName }}</p>
+      </div>
+    </div>
+  </main>
+</div>

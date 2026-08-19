@@ -1,0 +1,33 @@
+# .NET
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# Angular / Node
+**/node_modules/
+**/dist/
+.angular/
+.nx/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Visual Studio
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Azure / local settings
+appsettings.Development.json

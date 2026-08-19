@@ -1,0 +1,177 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">🛠️</div>
+      <div class="name">{{ adminName || 'Admin' }}</div>
+    </div>
+    <nav class="nav-menu">
+      <a (click)="setSection('assignWasher')" [class.active]="section==='assignWasher'">Assign Washer</a>
+      <a (click)="setSection('servicePackages')" [class.active]="section==='servicePackages'">Service Packages</a>
+      <a (click)="setSection('promoCodes')" [class.active]="section==='promoCodes'">Promo Codes</a>
+      <a (click)="setSection('addOns')" [class.active]="section==='addOns'">Add Ons</a>
+      <a (click)="logout()">Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div *ngIf="section === 'assignWasher'">
+    <h2>Assign Washer to Order</h2>
+    <form #assignWasherForm="ngForm" (ngSubmit)="assignWasher()">
+      <div class="form-group">
+        <label for="orderId">Order ID:</label>
+        <input type="number" id="orderId" name="orderId" [(ngModel)]="assignOrderId" required class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="washerId">Washer ID:</label>
+        <input type="text" id="washerId" name="washerId" [(ngModel)]="assignWasherId" required class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary">Assign</button>
+      <div *ngIf="assignWasherMessage" class="assign-message">{{ assignWasherMessage }}</div>
+    </form>
+  </div>
+    <div *ngIf="section === 'servicePackages'">
+  <h2>Service Packages</h2>
+  <!-- Create/Update Form -->
+  <form #servicePackageForm="ngForm" (ngSubmit)="saveServicePackage()">
+    <div class="form-group">
+      <label for="packageName">Name:</label>
+      <input type="text" id="packageName" name="name" [(ngModel)]="servicePackageFormModel.name" required class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="packageDesc">Description:</label>
+      <input type="text" id="packageDesc" name="description" [(ngModel)]="servicePackageFormModel.description" required class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="packagePrice">Price:</label>
+      <input type="number" id="packagePrice" name="price" [(ngModel)]="servicePackageFormModel.price" required class="form-control" min="0" />
+    </div>
+    <button type="submit" class="btn btn-primary">
+      {{ servicePackageFormModel.id ? 'Update' : 'Create' }} Package
+    </button>
+    <button *ngIf="servicePackageFormModel.id" type="button" class="btn btn-secondary" (click)="resetServicePackageForm()">Cancel</button>
+    <div *ngIf="servicePackageMessage" class="assign-message">{{ servicePackageMessage }}</div>
+  </form>
+
+  <!-- List Table -->
+  <table class="table service-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th style="width: 120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pkg of servicePackages">
+        <td>{{ pkg.name }}</td>
+        <td>{{ pkg.description }}</td>
+        <td>{{ pkg.price | currency }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editServicePackage(pkg)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteServicePackage(pkg.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    <div *ngIf="section === 'promoCodes'">
+  <h2>Promo Codes</h2>
+  <!-- Create/Update Form -->
+  <form #promoCodeForm="ngForm" (ngSubmit)="savePromoCode()">
+    <div class="form-group">
+      <label for="promoCode">Code:</label>
+      <input type="text" id="promoCode" name="code" [(ngModel)]="promoCodeFormModel.code" required class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="promoDiscount">Discount (%):</label>
+      <input type="number" id="promoDiscount" name="discountPercent" [(ngModel)]="promoCodeFormModel.discountPercent" required class="form-control" min="0" max="100" />
+    </div>
+    <div class="form-group">
+      <label for="promoValidTill">Valid Till:</label>
+      <input type="date" id="promoValidTill" name="validTill" [(ngModel)]="promoCodeFormModel.validTill" required class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">
+      {{ promoCodeFormModel.id ? 'Update' : 'Create' }} Promo Code
+    </button>
+    <button *ngIf="promoCodeFormModel.id" type="button" class="btn btn-secondary" (click)="resetPromoCodeForm()">Cancel</button>
+    <div *ngIf="promoCodeMessage" class="assign-message">{{ promoCodeMessage }}</div>
+  </form>
+
+  <!-- List Table -->
+  <table class="table service-table">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Discount (%)</th>
+        <th>Valid Till</th>
+        <th style="width: 120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let promo of promoCodes">
+        <td>{{ promo.code }}</td>
+        <td>{{ promo.discountPercent }}</td>
+        <td>{{ promo.validTill | date:'yyyy-MM-dd' }}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editPromoCode(promo)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deletePromoCode(promo.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    <div *ngIf="section === 'addOns'">
+  <h2>Add Ons</h2>
+  <!-- Create/Update Form -->
+  <form #addOnForm="ngForm" (ngSubmit)="saveAddOn()">
+    <div class="form-group">
+      <label for="addOnName">Name:</label>
+      <input type="text" id="addOnName" name="name" [(ngModel)]="addOnFormModel.name" required class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="addOnPrice">Price:</label>
+      <input type="number" id="addOnPrice" name="price" [(ngModel)]="addOnFormModel.price" required class="form-control" min="0" />
+    </div>
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="isActive" [(ngModel)]="addOnFormModel.isActive" />
+        Active
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      {{ addOnFormModel.id ? 'Update' : 'Create' }} Add On
+    </button>
+    <button *ngIf="addOnFormModel.id" type="button" class="btn btn-secondary" (click)="resetAddOnForm()">Cancel</button>
+    <div *ngIf="addOnMessage" class="assign-message">{{ addOnMessage }}</div>
+  </form>
+
+  <!-- List Table -->
+  <table class="table service-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Active</th>
+        <th style="width: 120px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let addOn of addOns">
+        <td>{{ addOn.name }}</td>
+        <td>{{ addOn.price | currency }}</td>
+        <td>
+          <span [ngClass]="{'text-success': addOn.isActive, 'text-danger': !addOn.isActive}">
+            {{ addOn.isActive ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-primary" (click)="editAddOn(addOn)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteAddOn(addOn.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+  </main>
+</div>

@@ -1,0 +1,321 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">🚗</div>
+      <div class="name">{{ customerName }}</div>
+    </div>
+    <nav class="nav-menu">
+      <a routerLink="/customer/dashboard" routerLinkActive="active" (click)="setSection('dashboard')">Dashboard</a>
+      <a routerLink="/customer/bookings" routerLinkActive="active" (click)="setSection('bookings')">My Bookings</a>
+      <a routerLink="/customer/cars" routerLinkActive="active" (click)="setSection('my-cars')">My Cars</a>
+      <a routerLink="/customer/promos" routerLinkActive="active" (click)="setSection('offers')">Offers & Promo Codes</a>
+      <a routerLink="/customer/cars" routerLinkActive="active" (click)="setSection('payment')">Payments</a>
+      <a routerLink="/customer/profile" routerLinkActive="active" (click)="setSection('profile')">Profile</a>
+      <!-- Only one Rate Washer link -->
+      <a routerLink="/customer/faq" routerLinkActive="active" (click)="setSection('rate')">Rate Washer</a>
+      <a (click)="logout()">Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div *ngIf="section==='dashboard'" class="dashboard">
+      <h1>Green Car Wash</h1>
+      <button class="book-button" (click)="bookNewWash()">Book New Wash</button>
+      <div *ngIf="showBookWash" class="modal-overlay">
+        <div class="modal-content">
+          <h3>Book New Wash</h3>
+          <form (ngSubmit)="submitWashBooking()">
+            <div class="form-group">
+              <label for="carId">Car</label>
+              <select id="carId" class="form-control" [(ngModel)]="washBooking.carId" name="carId" required>
+                <option *ngFor="let car of cars" [value]="car.id">{{ car.make }} {{ car.model }} ({{ car.year }})</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="packageId">Service Package</label>
+              <select id="packageId" class="form-control" [(ngModel)]="washBooking.packageId" name="packageId" required>
+                <option *ngFor="let pkg of packages" [value]="pkg.id">{{ pkg.name }} - ₹{{ pkg.price }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="promoCodeId">Promo Code</label>
+              <select id="promoCodeId" class="form-control" [(ngModel)]="washBooking.promoCodeId" name="promoCodeId">
+                <option [ngValue]="null">-- None --</option>
+                <option *ngFor="let promo of promoCodes" [value]="promo.id">{{ promo.code }} - {{ promo.description }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="scheduledDate">Scheduled Date</label>
+              <input id="scheduledDate" type="date" class="form-control" [(ngModel)]="washBooking.scheduledDate" name="scheduledDate" required />
+            </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input id="location" type="text" class="form-control" [(ngModel)]="washBooking.location" name="location" required />
+            </div>
+            <div class="form-group">
+              <label for="addOnIds">Add Ons</label>
+              <select id="addOnIds" class="form-control" multiple [(ngModel)]="washBooking.addOnIds" name="addOnIds">
+                <option *ngFor="let addOn of addOns" [value]="addOn.id">{{ addOn.name }} - ₹{{ addOn.price }}</option>
+              </select>
+              <small>Select multiple add-ons by holding Ctrl (Windows) or Cmd (Mac).</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Book</button>
+            <button type="button" class="btn btn-secondary" (click)="showBookWash = false">Cancel</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Dynamic Stats Section -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="count">{{ upcomingWashesCount }}</div>
+          <div class="label">Upcoming Washes</div>
+        </div>
+        <div class="stat-card">
+          <div class="count">{{ completedWashesCount }}</div>
+          <div class="label">Completed Washes</div>
+        </div>
+        <div class="stat-card">
+          <div class="count">{{ cancelledWashesCount }}</div>
+          <div class="label">Cancelled Washes</div>
+        </div>
+      </div>
+      <!-- Dynamic Promo Codes in Dashboard -->
+      <div class="promo-section">
+        <h2>Offers & Promo Codes</h2>
+        <div *ngIf="promoCodes.length === 0" class="no-promos">
+          <span>No promo codes available.</span>
+        </div>
+        <div *ngFor="let promo of promoCodes" class="promo-card">
+          <strong>{{ promo.code }}</strong>
+          <span>{{ promo.description }}</span>
+          <button>{{ promo.code }}</button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="section==='bookings'" class="bookings">
+      <h2>My Orders</h2>
+      <div *ngIf="orders.length === 0" class="no-orders">
+        <p>No orders found.</p>
+      </div>
+      <div class="order-cards">
+        <div *ngFor="let order of orders" class="order-card">
+          <div class="order-header">
+            <span class="order-id">Order #{{ order.id }}</span>
+            <span class="order-status" [ngClass]="order.status?.toLowerCase()">{{ order.status }}</span>
+          </div>
+          <div class="order-details">
+            <div><strong>Car:</strong> {{ order.carMake }} {{ order.carModel }} ({{ order.carYear }})</div>
+            <div><strong>Package:</strong> {{ order.packageName }}</div>
+            <div><strong>Promo Code:</strong> {{ order.promoCode || 'None' }}</div>
+            <div><strong>Add Ons:</strong>
+              <span *ngIf="order.addOns?.length">
+                <span *ngFor="let addOn of order.addOns; let last = last">
+                  {{ addOn.name }}<span *ngIf="!last">, </span>
+                </span>
+              </span>
+            </div>
+            <div><strong>Scheduled:</strong> {{ order.scheduledDate | date:'mediumDate' }}</div>
+            <div><strong>Location:</strong> {{ order.location }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="section==='my-cars'" class="my-cars">
+      <!-- Add Car Form -->
+      <div class="add-car-form">
+        <h3>Add a New Car</h3>
+        <form (ngSubmit)="addCar()">
+          <div class="form-group">
+            <label for="make">Make</label>
+            <input id="make" type="text" class="form-control" [(ngModel)]="newCar.make" name="make" required />
+          </div>
+          <div class="form-group">
+            <label for="model">Model</label>
+            <input id="model" type="text" class="form-control" [(ngModel)]="newCar.model" name="model" required />
+          </div>
+          <div class="form-group">
+            <label for="year">Year</label>
+            <input id="year" type="number" class="form-control" [(ngModel)]="newCar.year" name="year" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Add Car</button>
+        </form>
+      </div>
+
+      <!-- List of Cars -->
+      <div class="car-list">
+        <h3>Your Cars</h3>
+        <div *ngIf="cars.length === 0" class="no-cars">
+          <p>You have not added any cars yet.</p>
+        </div>
+        <div class="car-cards">
+          <div *ngFor="let car of cars; let i = index" class="car-card">
+            <div class="car-details">
+              <h4>{{ car.make }} {{ car.model }}</h4>
+              <p><strong>Year:</strong> {{ car.year }}</p>
+            </div>
+            <div class="car-actions">
+              <button class="btn btn-secondary" (click)="editCar(i)">Edit</button>
+              <button class="btn btn-danger" (click)="deleteCar(i)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Car Form -->
+      <div *ngIf="editingCarIndex !== null" class="edit-car-form">
+        <h3>Edit Car</h3>
+        <form (ngSubmit)="updateCar()">
+          <div class="form-group">
+            <label for="edit-make">Make</label>
+            <input id="edit-make" type="text" class="form-control" [(ngModel)]="editingCar.make" name="edit-make" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-model">Model</label>
+            <input id="edit-model" type="text" class="form-control" [(ngModel)]="editingCar.model" name="edit-model" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-year">Year</label>
+            <input id="edit-year" type="number" class="form-control" [(ngModel)]="editingCar.year" name="edit-year" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Update Car</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Offers Section -->
+    <div *ngIf="section==='offers'" class="offers">
+      <h2>All Promo Codes</h2>
+      <div *ngIf="promoCodes.length === 0" class="no-promos">
+        <span>No promo codes available.</span>
+      </div>
+      <div class="offers-list">
+        <div *ngFor="let promo of promoCodes" class="offer-card">
+          <div class="offer-header">
+            <span class="offer-code">{{ promo.code }}</span>
+            <span class="offer-discount">{{ promo.discount ? (promo.discount + '% OFF') : '' }}</span>
+          </div>
+          <div class="offer-desc">{{ promo.description }}</div>
+        </div>
+      </div>
+    </div> 
+
+    <div *ngIf="section==='profile'" class="profile">
+      <div class="profile-card">
+        <div class="profile-avatar">
+          <span class="avatar-icon">👤</span>
+        </div>
+        <div class="profile-details">
+          <h2><strong>Name : </strong>{{ customerFullName }}</h2>
+          <p><strong>Email : </strong> {{ customerEmail }}</p>
+          <p><strong>Phone : </strong> {{ customerPhone }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Section -->
+  <div *ngIf="section==='payment'" class="payment">
+    <h2>Payments</h2>
+    <div class="payment-summary">
+      <p>
+        <strong>Total Amount Due:</strong>
+        ₹{{ totalCompletedAmount }}
+      </p>
+    </div>
+    <form
+      *ngIf="unpaidCompletedOrders.length > 0"
+      (ngSubmit)="makePayment()"
+      #paymentForm="ngForm"
+      class="payment-form"
+    >
+      <div class="form-group">
+        <label>
+          <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="upi" required />
+          UPI
+        </label>
+        <label>
+          <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="card" required />
+          Card
+        </label>
+      </div>
+      <div class="form-group" *ngIf="paymentMethod === 'upi'">
+        <label for="upiId">UPI ID</label>
+        <input id="upiId" type="text" class="form-control" [(ngModel)]="upiId" name="upiId" required />
+      </div>
+      <div class="form-group" *ngIf="paymentMethod === 'card'">
+        <label for="cardNumber">Card Number</label>
+        <input id="cardNumber" type="text" class="form-control" [(ngModel)]="cardNumber" name="cardNumber" maxlength="16" required />
+        <label for="expiry">Expiry</label>
+        <input id="expiry" type="text" class="form-control" [(ngModel)]="expiry" name="expiry" placeholder="MM/YY" required />
+        <label for="cvv">CVV</label>
+        <input id="cvv" type="password" class="form-control" [(ngModel)]="cvv" name="cvv" maxlength="4" required />
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="paymentLoading">
+        {{ paymentLoading ? 'Processing...' : 'Pay Now' }}
+      </button>
+    </form>
+    <div *ngIf="unpaidCompletedOrders.length === 0" class="payment-info">
+      <span>No unpaid completed orders available for payment.</span>
+    </div>
+    <div *ngIf="paymentSuccess" class="payment-success">
+      <span>✅ Payment successful! Thank you for your payment.</span>
+    </div>
+    <div *ngIf="paymentError" class="payment-error">
+      <span>❌ {{ paymentError }}</span>
+    </div>
+  </div>
+
+<!-- ...existing code... -->
+
+    <!-- Rate Washer Section -->
+    <div *ngIf="section==='rate'" class="rate-washer">
+  <h2>Rate Washer</h2>
+  <div *ngIf="hasNoCompletedOrders" class="no-orders">
+    <p>No completed orders available for rating.</p>
+  </div>
+  <div class="order-cards">
+    <ng-container *ngFor="let order of orders">
+      <div class="order-card" *ngIf="order.status === 'COMPLETED'">
+            <div class="order-header">
+              <span class="order-id">Order #{{ order.id }}</span>
+              <span class="order-status completed">Completed</span>
+            </div>
+            <div class="order-details">
+              <div><strong>Car:</strong> {{ order.carMake }} {{ order.carModel }} ({{ order.carYear }})</div>
+              <div><strong>Package:</strong> {{ order.packageName }}</div>
+              <div><strong>Scheduled:</strong> {{ order.scheduledDate | date:'mediumDate' }}</div>
+              <div><strong>Location:</strong> {{ order.location }}</div>
+            </div>
+            <!-- Rating Section -->
+            <div class="rating-section">
+              <form (ngSubmit)="submitRating(order)">
+                <label for="rating-{{order.id}}"><strong>Rate this order:</strong></label>
+                <input
+                  id="rating-{{order.id}}"
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.5"
+                  [(ngModel)]="order.ratingValue"
+                  name="rating-{{order.id}}"
+                  required
+                  class="form-control"
+                  style="width: 80px; display: inline-block; margin-left: 10px;"
+                />
+                <button type="submit" class="btn btn-primary btn-sm" [disabled]="order.ratingLoading">
+                  {{ order.ratingId ? 'Update' : 'Submit' }}
+                </button>
+                <button *ngIf="order.ratingId" type="button" class="btn btn-danger btn-sm" (click)="deleteRating(order)">
+                  Delete
+                </button>
+                <span *ngIf="order.ratingMessage" class="rating-message">{{ order.ratingMessage }}</span>
+              </form>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </main>
+</div>
